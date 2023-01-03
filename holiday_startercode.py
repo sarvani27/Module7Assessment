@@ -29,24 +29,18 @@ class HolidayList():
     
     def addHoliday(self, holidayObj):
         # Make sure holidayObj is an Holiday Object by checking the type
-        if type(holidayObj) != Holiday:
-            print("The holiday you entered is not a valid holiday! Please try again.")
-        
-        
         # Use innerHolidays.append(holidayObj) to add holiday
-        h = Holiday(
-        name = h['name'],
-        date = h['date']
-        )
-        self.innerHolidays.append(h)
-        
         # print to the user that you added a holiday
-        print(f'Great Job! You have added {holidayObj} within your holiday list.')
 
+        if isinstance(holidayObj, Holiday):
+            self.innerHolidays.append(holidayObj)
+            print(f'Success! You have added {holidayObj} within your holiday list.')
+        
 
     def findHoliday(self, HolidayName, Date):
         # Find Holiday in innerHolidays
         # Return Holiday
+        
         for i in innerHolidays:
             if i.name == HolidayName and i.date == Date:
                 print(f'{i} has been found within your calendar!')
@@ -68,63 +62,32 @@ class HolidayList():
     
     
     def read_json(self, filelocation):
-        
-       # Read in things from json file location
-        filelocation = 'Module7Assessment/holidays.json'
-        with open (filelocation, "r") as f:
-            data = json.load(f, indent=4)
-            print (data)
-            
-       
+        # Read in things from json file location
         # Use addHoliday function to add holidays to inner list.
-            for i in data["holidays"]:
-                 h = Holiday(
-                name = h['name'],
-                date = h['date']
-                )
-                self.addHoliday(h)
+
+        with open(filelocation) as f:
+            data = json.load(f)
+            for i in data['holidays']:
+                add_holi = Holiday(i['name'], i['date'])
+                self.addHoliday(add_holi)
 
     
     
     def save_to_json(self, filelocation):
         # Write out json file to selected file.
-        pass
+
+        save_holidays = json.dumps(self.innerHolidays, indent = None)
+        with open('holidays.json', 'r') as f:
+            f.write(save_holidays)
+        
     
     
-    def scrapeHolidays(self):
+#     def scrapeHolidays(self):
         # Scrape Holidays from https://www.timeanddate.com/holidays/us/ 
-        
-        # Remember, 2 previous years, current year, and 2  years into the future. You can scrape multiple years by adding year to the timeanddate URL. For example https://www.timeanddate.com/holidays/us/2022
-        
-            # want the years from 2020 to 2024. 
-            # number of holidays in 2020 = 379
-            # number of holidays in 2021 = 347
-            # number of holidays in 2022 = 351
-            # number of holidays in 2023 = 341
-            # number of holidays in 2024 = 333
-        
-            scrape_holidays = []
-            
-            for year in range (2020,2025):
-            
-                html = requests.get("https://www.timeanddate.com/holidays/us/{year}")
-                soup = BeautifulSoup(html, "html.parser")
-                table = soup.find("table", attrs = {'id':'holidays-table'})
-                tbody = table.find('tbody')
-                
-            
-                
-                
-                
-                
-                
-        
+        # Remember, 2 previous years, current year, and 2  years into the future. You can scrape multiple years by adding year to the timeanddate URL. For example https://www.timeanddate.com/holidays/us/2022       
         # Check to see if name and date of holiday is in innerHolidays array
-        
         # Add non-duplicates to innerHolidays
-        
         # Handle any exceptions.     
-        
     
     
     def numHolidays(self):
@@ -134,126 +97,113 @@ class HolidayList():
     
     def filter_holidays_by_week(self, year, week_number):
         # Use a Lambda function to filter by week number and save this as holidays, use the filter on innerHolidays
-       
         # Week number is part of the the Datetime object
-        
         # Cast filter results as list
-        
         # return your holidays
-       pass
+        
+        holidayweek = list(filter(lambda a: a.values()[1].strftime('%W') == week_number and a.values()[1].strftime('%Y') == year, self.holidayobject))
+        return holidayweek
+        
     
     
     def displayHolidaysInWeek(self, holidayList):
         # Use your filter_holidays_by_week to get list of holidays within a week as a parameter
+        # Output formated holidays in the week. 
+        # * Remember to use the holiday __str__ method.
+        
         for i in holidayList: 
             if holidayList == None:
                 print("This holiday is not shown within the calendar.")
             else:
                 print("This holiday is shown within the calendar.")
-        # Output formated holidays in the week. 
-        
-        # * Remember to use the holiday __str__ method.
-    
+ 
     
     
     def viewCurrentWeek(self):
         # Use the Datetime Module to look up current week and year
-      
         # Use your filter_holidays_by_week function to get the list of holidays 
-        
         # for the current week/year
-        
         # Use your displayHolidaysInWeek function to display the holidays in the week
       
-
+        today = datetime.today()
+        iso = today.isocalendar()
+        weeknumber = iso[1]
+        return weeknumber 
 
 
 def main():
+    initholiday = HolidayList()
+    filelocation = "holidays.json"
+    initholiday.read_json(filelocation)
+    changes = 0
+    stop = 0
+    
+    while stop == 0:
+        print('Holiday Menu')
+        print("===========")
+        print("1. Add a Holiday")
+        print("2. Remove a Holiday")
+        print("3. Save Holiday List")
+        print("4. View Holidays")
+        print("5. Exit")
+        option_menu = int(input('Please select an option shown above:'))
 
-    # Large Pseudo Code steps
-    # -------------------------------------
-    # 1. Initialize HolidayList Object
-    
-    initializing_holidaylist = HolidayList()
-    
-    # 2. Load JSON file via HolidayList read_json function
-    
-    initializing_holidaylis.read_json("holidays.json")
-    
-    # 3. Scrape additional holidays using your HolidayList scrapeHolidays function.
-    
-    initializing_holidaylist.scrapeHolidays()
-    
-    # 3. Create while loop for user to keep adding or working with the Calender
-    
-    menu_user = True
-    saved_work = False
-    
-    Print("Holiday Management")
-    Print("===================")
-    
-    
-    
-    # 4. Display User Menu (Print the menu)
-    
-    while menu_user: 
-        
-        Print('Holiday Menu')
-        Print("===========")
-        Print("1. Add a Holiday")
-        Print("2. Remove a Holiday")
-        Print("3. Save Holiday List")
-        Print("4. View Holidays")
-        Print("5. Exit")
-        
-        Menu_options = int(input(f'Please select an option shown above.'))
-    
-        if Menu_options == 1:
-            Print("Add a Holiday")
-            Print("==============")
-            holiday_choice = str(input(f'Please add a holiday:'))
-            holiday_date = int(input(f'Please add a date (YYYY-MM-DD): ')
-        
-        if Menu_options == 2:
-            Print("Remove a Holiday")
-            remove_holiday = str(input(f'Name of the holiday you want to be removed:'))
-        
+        if option_menu == '1':
+            holiday_choice = input('Please add a holiday: ')
+            holiday_date = input('Please add a date (YYYY-MM-DD): ')
+            success = initholiday.addHoliday(holiday_choice, holiday_date)
+            if success == 1:
+                changes = 1
+            else:
+                print(" Your holiday has not been found.")
 
-        if Menu_options == 3:
-            Print("Save Holiday List")
-            Print("===================")
-            save_holiday = str(input(f'Are you sure you want to save your changes? [y/n]:'))
-                if save_holiday == 'y':  
-                    print("Your holiday has been saved within the calendar!")
-                    saved_work = True
-                else:
-                    Print("Sorry, the changes you have made have not been saved.")
+        elif option_menu == '2':
+            remove_holidayname = input('Name of the holiday you want to be removed: ')
+            remove_holidaydate = input('Date of the holiday (YYYY-MM-DD): ')
+            success = initholiday.removeHoliday(remove_holidayname, remove_holidaydate)
+            if success == 1:
+                changes = 1
+            else:
+                print('Your holiday has not been found.')
 
+        elif option_menu == '3':
+            if changes == 0:
+                print('Your changes have not been saved.')
+            else:
+                initholiday.save_to_json(filelocation)
+                print('Your changes have been saved.')
+                changes = 0
 
-        if Menu_options == 4:
-            Print("View Holidays")
-            Print("==============")
-            holiday_year = int(input("Which year?"))
-            holiday_week = str(input('Which week?'))
+        elif option_menu == '4':
+            print("View Holidays")
+            holiday_year = int(input("Please select a year between 2020 and 2024: "))
+            holiday_week = input("Which week? (1-52)... Leave Blank for current week: ")
+            if week == "":
+                initholiday.viewCurrentWeek(year)
+            else:
+                initholiday.displayHolidaysInWeek(year, week)
 
-        if Menu_options == 5:
-            Print('Exit')
-            Print("=====")
-            if saved_work = True:
-                holiday_exit = str(input("Are you sure you want to exit? [y/n]:"))
-                
+        elif option_menu == '5':
+            if changes == 0:
+                print('Goodbye!')
+#                 stop = 1
+            else:
+                holiday_exit = input('Do you want to exit? [y/n]: ')
+                if holiday_exit == "y":
+                      initholiday.save_to_json(filelocation)
+                      print("Goodbye!")
+                      stop = 1
+                else: 
+                      print("Return to menu.")
+                      stop = 1
+                  
+        else:
+            print('Something went wrong. Try again.')
+            
+if __name__ == "__main__":
+    main();
 
 
-    
-    
-    # 5. Take usehhor input for their action based on Menu and check the user input for errors
-    
-    # 6. Run appropriate method from the HolidayList object depending on what the user input is
-    
-    # 7. Ask the User if they would like to Continue, if not, end the while loop, ending the program.  If they do wish to continue, keep the program going.
-    
-    if __name__ == "__main__":
-        main();
 
 
 
