@@ -41,25 +41,24 @@ class HolidayList():
         # Find Holiday in innerHolidays
         # Return Holiday
         
-        for i in innerHolidays:
-            if i.name == HolidayName and i.date == Date:
-                print(f'{i} has been found within your calendar!')
-                return Holiday
-            else: 
-                print(f'Sorry, the holiday you looked for is not within the calendar.')
+        findHoliday = Holiday(HolidayName, Date)
+        for i in self.innerHolidays:
+            if i == findHoliday:
+                return i 
+        return False
     
     
     def removeHoliday(self, HolidayName, Date):
         # Find Holiday in innerHolidays by searching the name and date combination.
         # remove the Holiday from innerHolidays
         # inform user you deleted the holiday
-        for i in innerHolidays:
-            if i.name == HolidayName and i.date == Date:
-                self.innerHolidays.remove(i)
-                print(f' Holiday: {i} has been removed from your calendar')
-            else:
-                print(f' Holiday: {i} is not within your calendar! This cannot be removed.')
-    
+       
+        removeHoliday = self.findHoliday(HolidayName, Date)
+        if removeHoliday == False:
+            return False
+        else:
+            self.innerHolidays.remove(removeHoliday)
+
     
     def read_json(self, filelocation):
         # Read in things from json file location
@@ -132,76 +131,93 @@ class HolidayList():
 
 
 def main():
-    initholiday = HolidayList()
+
+    # 1. Initialize HolidayList Object
+    init_holidaylist = HolidayList()
+    # 2. Load JSON file via HolidayList read_json function
     filelocation = "holidays.json"
-    initholiday.read_json(filelocation)
-    changes = 0
-    stop = 0
+    init_holidaylist.read_json(filelocation)
+    # 3. Scrape additional holidays using your HolidayList scrapeHolidays function.
+#     initList.scrapeHolidays()
+    # 3. Create while loop for user to keep adding or working with the Calender
+    mainmenu = True
+    savedWork = False
+
+    print("Welcome to Holiday Manager!")
+    print("===================")
+#     print(f"There are {init_holidaylist.numHolidays()} holidays stored in the system.")
+ 
     
-    while stop == 0:
-        print('Holiday Menu')
-        print("===========")
+    while mainmenu:
+    # Display User Menu (Print the menu)
+        print("Holiday Menu")
+        print("===================")
         print("1. Add a Holiday")
-        print("2. Remove a Holiday")
+        print("2. Remove a holiday")
         print("3. Save Holiday List")
         print("4. View Holidays")
         print("5. Exit")
-        option_menu = int(input('Please select an option shown above:'))
-
-        if option_menu == '1':
-            holiday_choice = input('Please add a holiday: ')
-            holiday_date = input('Please add a date (YYYY-MM-DD): ')
-            success = initholiday.addHoliday(holiday_choice, holiday_date)
-            if success == 1:
-                changes = 1
+        option_menu = int(input("Please select an option shown above: "))
+        if option_menu == 1:
+            print("Add a Holiday")
+            print("===================")
+            holiday_choice = (input("Please add a holiday: "))
+            holiday_date = input("Please add a date (YYYY-MM-DD): ")
+            init_holidaylist.addHoliday(Holiday(holiday_choice, holiday_date))
+        elif option_menu == 2:
+            print("Remove a Holiday")
+            print("===================")
+            remove_holidayname = str(input("Name of the holiday you want to be removed:"))
+            remove_holidaydate = input("Date of the holiday (YYYY-MM-DD):")
+            init_holidaylist.removeHoliday(remove_holidayname, remove_holidaydate)
+#             if success == 1:
+#                 print ("Success! Your holiday has been removed from the system.")
+#             else: 
+#                 print("Sorry, your holiday has not been found.")
+        elif option_menu == 3:
+            print("Saving Holiday List")
+            print("===================")
+            wantSave = str(input("Do you want to save your changes? [Y/N]: "))
+            if wantSave == "Y":
+                initList.save_to_json(filelocation)
+                print("Success! Your changes have been saved!")
+                savedWork = True
             else:
-                print(" Your holiday has not been found.")
-
-        elif option_menu == '2':
-            remove_holidayname = input('Name of the holiday you want to be removed: ')
-            remove_holidaydate = input('Date of the holiday (YYYY-MM-DD): ')
-            success = initholiday.removeHoliday(remove_holidayname, remove_holidaydate)
-            if success == 1:
-                changes = 1
-            else:
-                print('Your holiday has not been found.')
-
-        elif option_menu == '3':
-            if changes == 0:
-                print('Your changes have not been saved.')
-            else:
-                initholiday.save_to_json(filelocation)
-                print('Your changes have been saved.')
-                changes = 0
-
-        elif option_menu == '4':
+                print("Sorry! your changes have not been saved.")
+        elif option_menu == 4:
             print("View Holidays")
-            holiday_year = int(input("Please select a year between 2020 and 2024: "))
-            holiday_week = input("Which week? (1-52)... Leave Blank for current week: ")
-            if week == "":
-                initholiday.viewCurrentWeek(year)
+            print("===================")
+            holiday_year = input("Please select a year between 2020 and 2024: ")
+            holiday_week = input("Which week? (1-52)... Leave blank for current week]: ")
+            if holiday_week == "":
+                init_holidaylist.viewCurrentWeek()
             else:
-                initholiday.displayHolidaysInWeek(year, week)
+                print(f"These are the holidays for {holiday_year} week {holiday_week}:")
+                init_holidaylist.displayHolidaysInWeek(init_holidaylist.filter_holidays_by_week(holiday_year, holiday_week))
+        elif option_menu == 5:
+            if savedWork == True:
+                exit_option = input("Do you want to exit? [Y/N]: ")
+                if exit_option == 'Y':
+                    print('Goodbye!')
+                    break
+                elif exit_option == 'N':
+                    continue
+            elif savedWork == False:
+                unsaved_exit_option = input("Are you sure you want to exit? Your changes will be lost! [Y/N]: ")
+                if unsaved_exit_option == 'Y':
+                    print("Goodbye!")
+                    break
+                elif unsaved_exit_option == 'N':
+                    continue
 
-        elif option_menu == '5':
-            if changes == 0:
-                print('Goodbye!')
-#                 stop = 1
-            else:
-                holiday_exit = input('Do you want to exit? [y/n]: ')
-                if holiday_exit == "y":
-                      initholiday.save_to_json(filelocation)
-                      print("Goodbye!")
-                      stop = 1
-                else: 
-                      print("Return to menu.")
-                      stop = 1
                   
         else:
             print('Something went wrong. Try again.')
             
 if __name__ == "__main__":
     main();
+
+
 
 
 
